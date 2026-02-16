@@ -323,7 +323,7 @@ html_content = f"""
     <div class="container">
 
         <section class="section-intro">
-            <h2>Nuestra Esencia: "Todo lo que nos une"</h2>
+            <h2>Nuestra Esencia: "Migración con Propósito"</h2>
             <p>MORE es un catalizador de sueños para profesionales latinoamericanos excepcionales. Nuestra misión es
                 empoderar, guiar y conectar talento, facilitando su reconocimiento y establecimiento en EE. UU. con un
                 propósito claro y un plan de alto impacto.</p>
@@ -427,7 +427,7 @@ html_content = f"""
     </section>
 
     <footer>
-        <p>&copy; 2024 MORE - Todo lo que nos une. Manual de marca generado a partir de análisis de diseño.</p>
+        <p>&copy; 2024 MORE - Migración con Propósito. Manual de marca generado a partir de análisis de diseño.</p>
     </footer>
 
 </body>
@@ -478,7 +478,7 @@ story.append(Paragraph("MORE", styles['BodyText']))
 story.append(Spacer(1, 0.2*inch))
 story.append(Paragraph("Manual de Marca", styles['MainTitle']))
 story.append(Spacer(1, 0.5*inch))
-story.append(Paragraph("Nuestra Esencia: 'Todo lo que nos une'", styles['Heading1']))
+story.append(Paragraph("Nuestra Esencia: 'Migración con Propósito'", styles['Heading1']))
 story.append(Paragraph("""
 MORE es un catalizador de sueños para profesionales latinoamericanos excepcionales.
 Nuestra misión es empoderar, guiar y conectar talento, facilitando su reconocimiento
