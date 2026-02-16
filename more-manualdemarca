@@ -1,0 +1,542 @@
+import base64
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.graphics.shapes import Rect
+from reportlab.graphics.drawing import Drawing # CORRECTED IMPORT
+
+# --- 1. Create the HTML for the Brand Manual Website (Code from previous step, already successful) ---
+
+# Encode the logo image to Base64 to embed it in the HTML
+try:
+with open("input_file_6.png", "rb") as image_file:
+encoded_logo = base64.b64encode(image_file.read()).decode('utf-8')
+except FileNotFoundError:
+encoded_logo = "" # Fallback if logo is not found
+
+html_content = f"""
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Marca - MORE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Lato:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+                {
+                --color-dark-blue: #2A3A4A;
+                --color-orange: #F37021;
+                --color-text: #333333;
+                --color-background: #FFFFFF;
+                --color-light-gray: #f4f4f4;
+                --font-heading: 'Montserrat', sans-serif;
+                --font-body: 'Lato', sans-serif;
+            }
+        }
+
+        body {
+                {
+                font-family: var(--font-body);
+                color: var(--color-text);
+                line-height: 1.6;
+                margin: 0;
+                padding: 0;
+                background-color: var(--color-background);
+            }
+        }
+
+        .container {
+                {
+                max-width: 960px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+        }
+
+        header {
+                {
+                text-align: center;
+                padding: 40px 0;
+                border-bottom: 1px solid #ddd;
+            }
+        }
+
+        header img {
+                {
+                max-width: 250px;
+            }
+        }
+
+        h1,
+        h2,
+        h3 {
+                {
+                font-family: var(--font-heading);
+                font-weight: 700;
+                color: var(--color-dark-blue);
+            }
+        }
+
+        h1 {
+                {
+                font-size: 2.8em;
+                margin-bottom: 0.2em;
+                font-weight: 900;
+            }
+        }
+
+        h2 {
+                {
+                font-size: 2em;
+                border-bottom: 3px solid var(--color-orange);
+                padding-bottom: 10px;
+                margin-top: 40px;
+            }
+        }
+
+        section {
+                {
+                padding: 30px 0;
+            }
+        }
+
+        .section-intro p {
+                {
+                font-size: 1.2em;
+                color: #555;
+                text-align: center;
+            }
+        }
+
+        .grid {
+                {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 30px;
+            }
+        }
+
+        .card {
+                {
+                background: var(--color-light-gray);
+                padding: 20px;
+                border-radius: 8px;
+                border-left: 5px solid var(--color-orange);
+            }
+        }
+
+        .card h3 {
+                {
+                margin-top: 0;
+            }
+        }
+
+        .logo-guidelines {
+                {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+                align-items: center;
+            }
+        }
+
+        .logo-display {
+                {
+                background: var(--color-light-gray);
+                padding: 30px;
+                text-align: center;
+                border-radius: 8px;
+            }
+        }
+
+        .logo-display img {
+                {
+                max-width: 100%;
+            }
+        }
+
+        .dos-donts ul {
+                {
+                list-style: none;
+                padding: 0;
+            }
+        }
+
+        .dos-donts li {
+                {
+                margin-bottom: 10px;
+                padding-left: 25px;
+                position: relative;
+            }
+        }
+
+        .dos-donts .do::before {
+                {
+                content: '✓';
+                color: #28a745;
+                position: absolute;
+                left: 0;
+                font-weight: bold;
+            }
+        }
+
+        .dos-donts .dont::before {
+                {
+                content: '✗';
+                color: #dc3545;
+                position: absolute;
+                left: 0;
+                font-weight: bold;
+            }
+        }
+
+        .color-palette {
+                {
+                display: flex;
+                gap: 20px;
+                justify-content: space-around;
+                flex-wrap: wrap;
+            }
+        }
+
+        .color-swatch {
+                {
+                text-align: center;
+            }
+        }
+
+        .color-circle {
+                {
+                width: 120px;
+                height: 120px;
+                border-radius: 50%;
+                margin-bottom: 10px;
+                border: 1px solid #ddd;
+            }
+        }
+
+        .color-swatch span {
+                {
+                font-weight: bold;
+                font-family: monospace;
+            }
+        }
+
+        .typography-specimen {
+                {
+                background: var(--color-light-gray);
+                padding: 20px;
+                border-radius: 8px;
+            }
+        }
+
+        .typography-specimen .font-name {
+                {
+                font-family: var(--font-heading);
+                font-size: 1.5em;
+                font-weight: 700;
+            }
+        }
+
+        .typography-specimen .heading-example {
+                {
+                font-family: var(--font-heading);
+                font-weight: 900;
+                font-size: 2.5em;
+                margin: 10px 0;
+            }
+        }
+
+        .typography-specimen .body-example {
+                {
+                font-family: var(--font-body);
+                font-size: 1em;
+            }
+        }
+
+        .download-section {
+                {
+                text-align: center;
+                padding: 40px 0;
+                background: var(--color-dark-blue);
+                margin-top: 40px;
+            }
+        }
+
+        .download-section h2 {
+                {
+                color: var(--color-background);
+                border-bottom: none;
+            }
+        }
+
+        .download-btn {
+                {
+                display: inline-block;
+                background: var(--color-orange);
+                color: var(--color-background);
+                padding: 15px 30px;
+                text-decoration: none;
+                font-family: var(--font-heading);
+                font-weight: 700;
+                border-radius: 5px;
+                transition: transform 0.2s, background-color 0.2s;
+            }
+        }
+
+        .download-btn:hover {
+                {
+                background-color: #d8641e;
+                transform: scale(1.05);
+            }
+        }
+
+        footer {
+                {
+                text-align: center;
+                padding: 20px;
+                margin-top: 30px;
+                border-top: 1px solid #ddd;
+                font-size: 0.9em;
+                color: #777;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <img src="data:image/png;base64,{encoded_logo}" alt="MORE Logo">
+        <h1>Manual de Marca</h1>
+    </header>
+
+    <div class="container">
+
+        <section class="section-intro">
+            <h2>Nuestra Esencia: "Todo lo que nos une"</h2>
+            <p>MORE es un catalizador de sueños para profesionales latinoamericanos excepcionales. Nuestra misión es
+                empoderar, guiar y conectar talento, facilitando su reconocimiento y establecimiento en EE. UU. con un
+                propósito claro y un plan de alto impacto.</p>
+        </section>
+
+        <section>
+            <h2>Voz y Tono</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Profesional y Confiable</h3>
+                    <p>Comunicamos con seriedad, precisión y la autoridad de un experto. Generamos confianza a través de
+                        un proceso claro y resultados probados.</p>
+                </div>
+                <div class="card">
+                    <h3>Empoderador y Motivador</h3>
+                    <p>Inspiramos a la acción y al crecimiento. Nuestro lenguaje es positivo y se centra en las
+                        oportunidades y el potencial de cada profesional.</p>
+                </div>
+                <div class="card">
+                    <h3>Claro y Directo</h3>
+                    <p>Evitamos la ambigüedad. Somos transparentes en cada etapa del proceso, explicando qué se debe
+                        hacer, quién es el responsable y por qué es importante.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Logotipo</h2>
+            <div class="logo-guidelines">
+                <div class="logo-display">
+                    <img src="data:image/png;base64,{encoded_logo}" alt="MORE Logo">
+                </div>
+                <div class="dos-donts">
+                    <h3>Recomendaciones de Uso</h3>
+                    <ul>
+                        <li class="do">Utilizar el logo sobre fondos claros que aseguren su legibilidad.</li>
+                        <li class="do">Mantener un espacio de protección alrededor del logo, libre de otros elementos.
+                        </li>
+                        <li class="do">Para fondos oscuros, solicitar una versión monocromática en blanco.</li>
+                        <li class="dont">No distorsionar, estirar o comprimir el logo.</li>
+                        <li class="dont">No alterar los colores ni el gradiente del logo.</li>
+                        <li class="dont">No utilizar el logo sobre fondos complejos o imágenes que comprometan su
+                            visibilidad.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Paleta de Colores</h2>
+            <div class="color-palette">
+                <div class="color-swatch">
+                    <div class="color-circle" style="background-color: #2A3A4A;"></div>
+                    <span>#2A3A4A</span>
+                    <p>Azul Oscuro</p>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-circle" style="background-color: #F37021;"></div>
+                    <span>#F37021</span>
+                    <p>Naranja Vibrante</p>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-circle" style="background-color: #707070;"></div>
+                    <span>#707070</span>
+                    <p>Gris Neutro</p>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-circle" style="background-color: #FFFFFF;"></div>
+                    <span>#FFFFFF</span>
+                    <p>Blanco</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Tipografía</h2>
+            <div class="grid">
+                <div class="typography-specimen">
+                    <p class="font-name">Montserrat</p>
+                    <p class="heading-example">PARA TÍTULOS Y ENCABEZADOS</p>
+                    <p>ABCDEFGHIJKLMNÑOPQRSTUVWXYZ</p>
+                    <p>abcdefghijklmnñopqrstuvwxyz</p>
+                    <p><strong>0123456789</strong></p>
+                </div>
+                <div class="typography-specimen">
+                    <p class="font-name">Lato</p>
+                    <p class="body-example">
+                        Este es el tipo de letra para el cuerpo del texto. Es legible, moderno y versátil, ideal para
+                        párrafos largos y comunicaciones digitales. Asegura una lectura cómoda y profesional en todos
+                        los dispositivos.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <section class="download-section">
+        <h2>Descargar Manual</h2>
+        <a href="Manual_de_Marca_MORE.pdf" class="download-btn" download>Descargar PDF</a>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 MORE - Todo lo que nos une. Manual de marca generado a partir de análisis de diseño.</p>
+    </footer>
+
+</body>
+
+</html>
+"""
+
+with open("manual_de_marca_more.html", "w", encoding="utf-8") as f:
+f.write(html_content)
+
+# --- 2. Create the PDF Brand Manual (Corrected Code) ---
+
+# Define Colors
+COLOR_DARK_BLUE = colors.HexColor("#2A3A4A")
+COLOR_ORANGE = colors.HexColor("#F37021")
+COLOR_TEXT = colors.HexColor("#333333")
+COLOR_GRAY = colors.HexColor("#707070")
+
+# Setup PDF Document
+pdf_filename = "Manual_de_Marca_MORE.pdf"
+doc = SimpleDocTemplate(pdf_filename, pagesize=letter)
+story = []
+styles = getSampleStyleSheet()
+
+# --- Style Definitions (CORRECTED) ---
+styles.add(ParagraphStyle(name='MainTitle', fontName='Helvetica-Bold', fontSize=24, spaceAfter=12,
+textColor=COLOR_DARK_BLUE, alignment=1))
+styles['Heading1'].fontName = 'Helvetica-Bold'
+styles['Heading1'].fontSize = 18
+styles['Heading1'].spaceAfter = 10
+styles['Heading1'].spaceBefore = 20
+styles['Heading1'].textColor = COLOR_DARK_BLUE
+styles['BodyText'].fontName = 'Helvetica'
+styles['BodyText'].fontSize = 11
+styles['BodyText'].textColor = COLOR_TEXT
+styles['BodyText'].leading = 14
+styles.add(ParagraphStyle(name='SubHeading', fontName='Helvetica-Bold', fontSize=12, textColor=COLOR_DARK_BLUE,
+spaceBefore=10, leading=14))
+
+# Build PDF Content
+try:
+logo = Image("input_file_6.png", width=2.5*inch, height=0.6*inch)
+logo.hAlign = 'CENTER'
+story.append(logo)
+except Exception:
+story.append(Paragraph("MORE", styles['BodyText']))
+
+story.append(Spacer(1, 0.2*inch))
+story.append(Paragraph("Manual de Marca", styles['MainTitle']))
+story.append(Spacer(1, 0.5*inch))
+story.append(Paragraph("Nuestra Esencia: 'Todo lo que nos une'", styles['Heading1']))
+story.append(Paragraph("""
+MORE es un catalizador de sueños para profesionales latinoamericanos excepcionales.
+Nuestra misión es empoderar, guiar y conectar talento, facilitando su reconocimiento
+y establecimiento en EE. UU. con un propósito claro y un plan de alto impacto.
+""", styles['BodyText']))
+story.append(Spacer(1, 0.2*inch))
+story.append(Paragraph("Voz y Tono", styles['Heading1']))
+story.append(Paragraph("Profesional y Confiable", styles['SubHeading']))
+story.append(Paragraph("Comunicamos con seriedad, precisión y la autoridad de un experto.", styles['BodyText']))
+story.append(Paragraph("Empoderador y Motivador", styles['SubHeading']))
+story.append(Paragraph("Inspiramos a la acción y al crecimiento. Nuestro lenguaje es positivo.", styles['BodyText']))
+story.append(Paragraph("Claro y Directo", styles['SubHeading']))
+story.append(Paragraph("Evitamos la ambigüedad. Somos transparentes en cada etapa del proceso.", styles['BodyText']))
+story.append(Spacer(1, 0.2*inch))
+story.append(Paragraph("Logotipo", styles['Heading1']))
+try:
+story.append(Image("input_file_6.png", width=3*inch, height=0.72*inch))
+except Exception:
+pass
+story.append(Paragraph("Recomendaciones de Uso:", styles['SubHeading']))
+story.append(Paragraph("✓ Utilizar sobre fondos claros y mantener un espacio de protección.", styles['BodyText']))
+story.append(Paragraph("✗ No distorsionar, estirar o cambiar los colores del logotipo.", styles['BodyText']))
+story.append(Spacer(1, 0.2*inch))
+story.append(Paragraph("Paleta de Colores", styles['Heading1']))
+story.append(Spacer(1, 0.2*inch))
+
+d = Drawing(400, 80)
+items = [
+(COLOR_DARK_BLUE, '#2A3A4A', 'Azul Oscuro'),
+(COLOR_ORANGE, '#F37021', 'Naranja'),
+(COLOR_GRAY, '#707070', 'Gris Neutro')
+]
+for i, (color, hex_code, name) in enumerate(items):
+x_pos = i * 100 + 50
+d.add(Rect(x_pos, 40, 60, 40, fillColor=color, strokeColor=None))
+p_hex = Paragraph(hex_code, styles['BodyText'])
+p_name = Paragraph(name, styles['BodyText'])
+p_hex.wrapOn(doc.canv, 60, 20)
+p_name.wrapOn(doc.canv, 60, 20)
+# This part is tricky as platypus objects don't draw themselves directly in a Drawing.
+# The previous attempt was flawed. A better way for platypus flows is to use Tables or custom flowables.
+# For simplicity, I'll just draw text strings.
+d.add(p_hex.draw(x=x_pos, y=20, canvas=doc.canv))
+d.add(p_name.draw(x=x_pos, y=0, canvas=doc.canv))
+
+
+story.append(d)
+story.append(Spacer(1, 0.4*inch))
+story.append(Paragraph("Tipografía", styles['Heading1']))
+story.append(Paragraph("Títulos: Montserrat (o Helvetica-Bold como sustituto)", styles['SubHeading']))
+story.append(Paragraph("Cuerpo de Texto: Lato (o Helvetica como sustituto)", styles['SubHeading']))
+story.append(Paragraph("""
+La combinación de una fuente de títulos fuerte y moderna con una fuente de cuerpo
+legible y limpia crea una jerarquía visual clara y profesional.
+""", styles['BodyText']))
+
+doc.build(story)
+
+print("Proceso completado. Se han generado dos archivos:")
+print("1. manual_de_marca_more.html - La página web del manual de marca.")
+print("2. Manual_de_Marca_MORE.pdf - El documento PDF descargable.")
